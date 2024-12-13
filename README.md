@@ -1,3 +1,11 @@
+# scott_iris_hack branch notes
+See the [scott.notes.md](scott.notes.md) for details about how scott has hacked up this branch.
+
+tl;dr of that : 
+> Next step: pull down to the cluster and see if I can get our training of iris to work in a reproducible fashion.
+
+
+
 # Transformers are Sample-Efficient World Models (IRIS)
 
 [Transformers are Sample-Efficient World Models](https://openreview.net/forum?id=vhFu1Acb0xb) <br>

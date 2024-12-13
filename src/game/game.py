@@ -108,7 +108,7 @@ class Game:
             if do_wait:
                 continue
 
-            _, reward, done, info = self.env.step(action)
+            _, reward, terminated, truncated, info = self.env.step(action)
 
             img = info['rgb'] if isinstance(self.env, gym.Env) else self.env.render()
             draw_game(img)
@@ -123,7 +123,7 @@ class Game:
                 clear_header()
                 draw_text(f'Action: {self.action_names[action]}', idx_line=0)
                 draw_text(f'Reward: {reward if isinstance(reward, float) else reward.item(): .2f}', idx_line=1)
-                draw_text(f'Done: {done}', idx_line=2)
+                draw_text(f'Done: {terminated or truncated}', idx_line=2)
                 if info is not None:
                     assert isinstance(info, dict)
                     for i, (k, v) in enumerate(info.items()):
@@ -132,7 +132,7 @@ class Game:
             pygame.display.flip()   # update screen
             clock.tick(self.fps)    # ensures game maintains the given frame rate
 
-            if do_reset or done:
+            if do_reset or terminated or truncated:
                 self.env.reset()
                 do_reset = False
 
