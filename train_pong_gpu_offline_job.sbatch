@@ -6,4 +6,4 @@
 
 
 # Execute the main script
-bash /home/scott/github/VersesTech/scott_iris_hack/train_pong_gpu_offline.sh
+bash /home/scott/github/VersesTech/scott_iris_hack_2/train_pong_gpu_offline.sh
