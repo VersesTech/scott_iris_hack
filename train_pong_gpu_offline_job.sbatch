@@ -1,8 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=train_pong_gpu_offline  # Name of the job
+#SBATCH -G 1
+#SBATCH --job-name=off_pong_100k  # Name of the job
 #SBATCH --gres=gpu:1                       # Request 1 GPU
-#SBATCH --output=log.train_pong_gpu_offline_%j.out     # Log standard output to a file (job ID will replace %j)
-#SBATCH --error=log.train_pong_gpu_offline_%j.err      # Log standard error to a file (job ID will replace %j)
+#SBATCH --output=log.off_pong_100k_%j.out     # Log standard output to a file (job ID will replace %j)
+#SBATCH --error=log.off_pong_100k_%j.err      # Log standard error to a file (job ID will replace %j)
 
 
 # Execute the main script
