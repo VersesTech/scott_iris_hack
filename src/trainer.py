@@ -125,6 +125,7 @@ class Trainer:
         self.finish()
 
     def train_agent(self, epoch: int) -> None:
+        print(f"Training agent, starting epoch {epoch}")
         self.agent.train()
         self.agent.zero_grad()
 
