@@ -263,9 +263,9 @@ class Trainer:
         shutil.copytree(src=self.ckpt_dir, dst=tmp_checkpoint_dir, ignore=shutil.ignore_patterns('dataset'))
         self._save_checkpoint(epoch, save_agent_only)
         shutil.rmtree(tmp_checkpoint_dir)
-        this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
-        print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
-        shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
+        #this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
+        #print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
+        #shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
 
     def load_checkpoint(self) -> None:
         assert self.ckpt_dir.is_dir()
