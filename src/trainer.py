@@ -268,6 +268,10 @@ class Trainer:
 
         #self.max_number_of_snapshots_saved
         #self.snapshots_saved_count = 0
+        #self.cfg.common.epochs
+
+        raise Exception(f"max_number_of_snapshots_saved: {self.max_number_of_snapshots_saved}, snapshots_saved_count: {self.snapshots_saved_count}, epochs: {self.cfg.common.epochs}")
+
         #this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
         #print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
         #shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
