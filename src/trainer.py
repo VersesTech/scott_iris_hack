@@ -41,7 +41,10 @@ class Trainer:
         self.start_epoch = 1
         self.device = torch.device(cfg.common.device)
 
-        self.ckpt_dir = Path('checkpoints')
+        self.ckpt_dir = Path(cfg.initialization.output_path)
+
+        self.max_number_of_snapshots_saved = cfg.collection.train.max_number_of_snapshots_saved if cfg.collection.train.max_number_of_snapshots_saved is not None else 0
+        self.snapshots_saved_count = 0
         self.media_dir = Path('media')
         self.episode_dir = self.media_dir / 'episodes'
         self.reconstructions_dir = self.media_dir / 'reconstructions'
@@ -126,7 +129,6 @@ class Trainer:
         self.finish()
 
     def train_agent(self, epoch: int) -> None:
-        print(f"Training agent, starting from epoch {epoch}")
         self.agent.train()
         self.agent.zero_grad()
 
@@ -263,6 +265,9 @@ class Trainer:
         shutil.copytree(src=self.ckpt_dir, dst=tmp_checkpoint_dir, ignore=shutil.ignore_patterns('dataset'))
         self._save_checkpoint(epoch, save_agent_only)
         shutil.rmtree(tmp_checkpoint_dir)
+
+        #self.max_number_of_snapshots_saved
+        #self.snapshots_saved_count = 0
         #this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
         #print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
         #shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
