@@ -5,6 +5,12 @@
 #SBATCH --output=log.BoxingNoFrameskip-v4_200_50_%j.out
 #SBATCH --error=log.BoxingNoFrameskip-v4_200_50_%j.err
 
+
+# user / repo config
+current_user=$USER
+repo_name="scott_iris_hack"
+env_name="iris_env_scott_cluster_loginnode_3_9_20"
+
 # training config
 game_name="BoxingNoFrameskip-v4"
 common_device="cuda:0"
@@ -13,11 +19,6 @@ common_epochs=200
 stop_after_epochs=50
 max_snapshots=150
 RUN_DIR="/shared/$(current_user)/training_outputs/iris/$(game_name)/$(date +'%Y-%m-%d')/$(date +'%H-%M-%S')"
-
-# user / repo config
-current_user=$USER
-repo_name="scott_iris_hack"
-env_name="iris_env_scott_cluster_loginnode_3_9_20"
 
 # go to repo, activate env
 cd "/home/$(current_user)/github/VersesTech/$(repo_name)/"
