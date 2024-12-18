@@ -7,6 +7,7 @@ results/figures
 slurm*
 experiments
 iris_env_*
+roms
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
