@@ -9,6 +9,7 @@ experiments
 iris_env_*
 roms
 .DS_Store
+logs_from_cluster
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
