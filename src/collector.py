@@ -35,7 +35,7 @@ class Collector:
         to_log = []
         steps, episodes = 0, 0
         returns = []
-        observations, actions, rewards, terminateds, truncateds = [], [], [], [], []
+        observations, actions, rewards, dones = [], [], [], []
 
         burnin_obs_rec, mask_padding = None, None
         if set(self.episode_ids) != {None} and burn_in > 0:
@@ -57,12 +57,11 @@ class Collector:
             if random.random() < epsilon:
                 act = self.heuristic.act(obs).cpu().numpy()
 
-            self.obs, reward, terminated, truncated, _ = self.env.step(act)
+            self.obs, reward, done, _ = self.env.step(act)
 
             actions.append(act)
             rewards.append(reward)
-            terminateds.append(terminated)
-            truncateds.append(truncated)
+            dones.append(done)
 
             new_steps = len(self.env.mask_new_dones)
             steps += new_steps
@@ -73,8 +72,7 @@ class Collector:
             # Not a problem with a SingleProcessEnv.
 
             if self.env.should_reset():
-
-                self.add_experience_to_dataset(observations, actions, rewards, np.logical_or(terminateds, truncateds))
+                self.add_experience_to_dataset(observations, actions, rewards, dones)
 
                 new_episodes = self.env.num_envs
                 episodes += new_episodes
@@ -92,11 +90,11 @@ class Collector:
                 self.obs = self.env.reset()
                 self.episode_ids = [None] * self.env.num_envs
                 agent.actor_critic.reset(n=self.env.num_envs)
-                observations, actions, rewards, terminateds, truncateds = [], [], [], [], []
+                observations, actions, rewards, dones = [], [], [], []
 
         # Add incomplete episodes to dataset, and complete them later.
         if len(observations) > 0:
-            self.add_experience_to_dataset(observations, actions, rewards, np.logical_or(terminateds, truncateds))
+            self.add_experience_to_dataset(observations, actions, rewards, dones)
 
         agent.actor_critic.clear()
 

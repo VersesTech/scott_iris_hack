@@ -1,14 +1,21 @@
 
 ## check out envs in gym
-import gymnasium as gym
+#import gymnasium as gym
 #for python 3.11
 #print(*sorted(gym.envs.registry.keys()), sep="\n")
 import ale_py
-gym.register_envs(ale_py)
-env = gym.make("ALE/Breakout-v5")
+import gym
+#gym.register_envs(ale_py)
+#env = gym.make("ALE/Breakout-v5")
 
 ## this is for python 3.9
-#env_ids = [env_spec.id for env_spec in gym.envs.registry.all()]
+#print(*sorted([env_spec.id for env_spec in gym.envs.registry.all()]), sep="\n")
+
+from gym import envs
+from pprint import pprint
+pprint(envs.registry.keys())
+
+#env_ids = [env_spec.id for env_spec in gym.envs.registry]
 #print(*sorted(env_ids), sep="\n")
 
 ## check torch version

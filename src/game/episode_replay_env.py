@@ -70,14 +70,6 @@ class EpisodeReplayEnv:
     def ends(self):
         return self._episode.ends
 
-    @property
-    def terminations(self):
-        return self._episode.terminations
-
-    @property
-    def truncations(self):
-        return self._episode.truncations
-
     def reset(self):
         return self.observations[self._t]
 

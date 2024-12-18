@@ -17,13 +17,12 @@ wandb:
 
 initialization:
   path_to_checkpoint: null
-  output_path: "outputs"
   load_tokenizer: False
   load_world_model: False
   load_actor_critic: False
 
 common:
-  epochs: 300
+  epochs: 300?
   device: cuda:0
   do_checkpoint: True
   seed: 0
@@ -35,7 +34,6 @@ collection:
     num_envs: 1
     stop_after_epochs: 50
     num_episodes_to_save: 10
-    max_number_of_snapshots_saved: 0
     config:
       epsilon: 0.01
       should_sample: True

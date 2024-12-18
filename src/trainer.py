@@ -1,3 +1,4 @@
+import subprocess
 from collections import defaultdict
 from functools import partial
 from pathlib import Path
@@ -41,6 +42,10 @@ class Trainer:
         self.device = torch.device(cfg.common.device)
 
         self.ckpt_dir = Path('checkpoints')
+
+        self.max_number_of_snapshots_saved = cfg.collection.train.max_number_of_snapshots_saved if cfg.collection.train.max_number_of_snapshots_saved is not None else 0
+        self.snapshots_saved_every_n_epochs = 0 if self.max_number_of_snapshots_saved == 0 else self.cfg.common.epochs // self.max_number_of_snapshots_saved
+        self.snapshots_saved_count = 0
         self.media_dir = Path('media')
         self.episode_dir = self.media_dir / 'episodes'
         self.reconstructions_dir = self.media_dir / 'reconstructions'
@@ -257,6 +262,14 @@ class Trainer:
                 torch.save(self.test_dataset.num_seen_episodes, self.ckpt_dir / 'num_seen_episodes_test_dataset.pt')
 
     def save_checkpoint(self, epoch: int, save_agent_only: bool) -> None:
+
+        if self.snapshots_saved_every_n_epochs != 0 and self.snapshots_saved_count < self.max_number_of_snapshots_saved:
+            if epoch % self.snapshots_saved_every_n_epochs == 0:
+                this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
+                print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
+                shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
+                self.snapshots_saved_count += 1
+
         tmp_checkpoint_dir = Path('checkpoints_tmp')
         shutil.copytree(src=self.ckpt_dir, dst=tmp_checkpoint_dir, ignore=shutil.ignore_patterns('dataset'))
         self._save_checkpoint(epoch, save_agent_only)

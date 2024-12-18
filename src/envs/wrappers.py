@@ -7,7 +7,6 @@ from typing import Tuple
 import gym
 import numpy as np
 from PIL import Image
-from gym.core import ObsType
 
 
 def make_atari(id, size=64, max_episode_steps=None, noop_max=30, frame_skip=4, done_on_life_loss=False, clip_reward=False):
@@ -65,16 +64,16 @@ class NoopResetEnv(gym.Wrapper):
         if self.override_num_noops is not None:
             noops = self.override_num_noops
         else:
-            noops = np.random.randint(1, self.noop_max + 1)
+            noops = self.unwrapped.np_random.randint(1, self.noop_max + 1)
         assert noops > 0
         obs = None
         for _ in range(noops):
-            obs, _, terminated, truncated, _ = self.env.step(self.noop_action)
-            if terminated or truncated:
+            obs, _, done, _ = self.env.step(self.noop_action)
+            if done:
                 obs = self.env.reset(**kwargs)
         return obs
 
-    def step(self, action) -> tuple[ObsType, float, bool, bool, dict]:
+    def step(self, action):
         return self.env.step(action)
 
 
@@ -87,9 +86,8 @@ class EpisodicLifeEnv(gym.Wrapper):
         self.lives = 0
         self.was_real_done = True
 
-    def step(self, action) -> tuple[ObsType, float, bool, bool, dict]:
-        obs, reward, terminated, truncated, info = self.env.step(action)
-        done = terminated or truncated
+    def step(self, action):
+        obs, reward, done, info = self.env.step(action)
         self.was_real_done = done
         # check current lives, make loss of life terminal,
         # then update lives to handle bonus lives
@@ -100,7 +98,7 @@ class EpisodicLifeEnv(gym.Wrapper):
             # the environment advertises done.
             done = True
         self.lives = lives
-        return obs, reward, terminated, truncated, info
+        return obs, reward, done, info
 
     def reset(self, **kwargs):
         """Reset only when lives are exhausted.
@@ -111,7 +109,7 @@ class EpisodicLifeEnv(gym.Wrapper):
             obs = self.env.reset(**kwargs)
         else:
             # no-op step to advance from terminal/lost life state
-            obs, _, _, _, _ = self.env.step(0)
+            obs, _, _, _ = self.env.step(0)
         self.lives = self.env.unwrapped.ale.lives()
         return obs
 
@@ -126,25 +124,24 @@ class MaxAndSkipEnv(gym.Wrapper):
         self._skip = skip
         self.max_frame = np.zeros(env.observation_space.shape, dtype=np.uint8)
 
-    def step(self, action) -> Tuple[ObsType, float, bool, bool, dict]:
+    def step(self, action):
         """Repeat action, sum reward, and max over last observations."""
         total_reward = 0.0
-        done, terminated, truncated, info = None, None, None, None
+        done = None
         for i in range(self._skip):
-            obs, reward, terminated, truncated, info = self.env.step(action)
-            done = terminated or truncated
+            obs, reward, done, info = self.env.step(action)
             if i == self._skip - 2:
                 self._obs_buffer[0] = obs
             if i == self._skip - 1:
                 self._obs_buffer[1] = obs
             total_reward += reward
-            if terminated or truncated:
+            if done:
                 break
-        # Note that the observation on the terminated or truncated frame
+        # Note that the observation on the done=True frame
         # doesn't matter
         self.max_frame = self._obs_buffer.max(axis=0)
 
-        return self.max_frame, total_reward, terminated, truncated, info
+        return self.max_frame, total_reward, done, info
 
     def reset(self, **kwargs):
         return self.env.reset(**kwargs)

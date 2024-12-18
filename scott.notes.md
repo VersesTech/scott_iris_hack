@@ -1,3 +1,39 @@
+# newer notes re: dec 16
+
+```
+python3.9 -m venv iris_env_scott_local_3_9_20
+#python3.9 -m venv iris_env_scott_cluster_loginnode_3_9_20
+source iris_env_scott_local_3_9_20/bin/activate
+pip install -r requirements.txt
+```
+
+## scott getting an error on gym=0.21.0 on macbook
+this seemed to work just fine on the login node (linux)
+
+```
+Collecting gym==0.21.0 (from gym[accept-rom-license]==0.21.0->-r requirements.txt (line 3))
+  Using cached gym-0.21.0.tar.gz (1.5 MB)
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... error
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [3 lines of output]
+      /private/var/folders/_l/_09gzxn97x137yclkhgjn7680000gs/T/pip-build-env-5hs1l5rq/overlay/lib/python3.9/site-packages/setuptools/_distutils/dist.py:261: UserWarning: Unknown distribution option: 'tests_require'
+        warnings.warn(msg)
+      error in gym setup command: 'extras_require' must be a dictionary whose values are strings or lists of strings containing valid project/version requirement specifiers.
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+****
+```
+
+
+
+
+# OLD NOTES FOLLOW
+
 # overview
 
 The original requirements.txt file won't build as-is (without indeterminate hacking).

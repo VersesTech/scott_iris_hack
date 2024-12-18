@@ -1,10 +1,7 @@
-from typing import Tuple
-
 from einops import rearrange
 import numpy as np
 from PIL import Image
 import torch
-from gym.core import ObsType
 from torchvision.transforms.functional import InterpolationMode, resize
 
 from agent import Agent
@@ -39,10 +36,10 @@ class AgentEnv:
         self._return = 0
         return obs
 
-    def step(self, *args, **kwargs) -> Tuple[ObsType, float, bool, bool, dict]:
+    def step(self, *args, **kwargs) -> torch.FloatTensor:
         with torch.no_grad():
             act = self.agent.act(self.obs, should_sample=True).cpu().numpy()
-        obs, reward, terminated, truncated, _ = self.env.step(act)
+        obs, reward, done, _ = self.env.step(act)
         self.obs = self._to_tensor(obs) if isinstance(self.env, SingleProcessEnv) else obs
         self._t += 1
         self._return += reward[0]
@@ -51,7 +48,7 @@ class AgentEnv:
             'action': self.action_names[act[0]],
             'return': self._return,
         }
-        return obs, reward, terminated, truncated, info
+        return obs, reward, done, info
 
     def render(self) -> Image.Image:
         assert self.obs.size() == (1, 3, 64, 64)

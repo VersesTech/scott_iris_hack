@@ -1,12 +1,11 @@
 import random
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union
 
 import gym
 from einops import rearrange
 import numpy as np
 from PIL import Image
 import torch
-from gym.core import ObsType
 from torch.distributions.categorical import Categorical
 import torchvision
 
@@ -54,7 +53,7 @@ class WorldModelEnv:
         return outputs_wm.output_sequence  # (B, K, E)
 
     @torch.no_grad()
-    def step(self, action: Union[int, np.ndarray, torch.LongTensor], should_predict_next_obs: bool = True) -> Tuple[ObsType, float, bool, bool, dict]:
+    def step(self, action: Union[int, np.ndarray, torch.LongTensor], should_predict_next_obs: bool = True) -> None:
         assert self.keys_values_wm is not None and self.num_observations_tokens is not None
 
         num_passes = 1 + self.num_observations_tokens if should_predict_next_obs else 1
@@ -74,8 +73,7 @@ class WorldModelEnv:
 
             if k == 0:
                 reward = Categorical(logits=outputs_wm.logits_rewards).sample().float().cpu().numpy().reshape(-1) - 1   # (B,)
-                terminated = Categorical(logits=outputs_wm.logits_terminated).sample().cpu().numpy().astype(bool).reshape(-1)       # (B,)
-                truncated = Categorical(logits=outputs_wm.logits_truncated).sample().cpu().numpy().astype(bool).reshape(-1)       # (B,)
+                done = Categorical(logits=outputs_wm.logits_ends).sample().cpu().numpy().astype(bool).reshape(-1)       # (B,)
 
             if k < self.num_observations_tokens:
                 token = Categorical(logits=outputs_wm.logits_observations).sample()
@@ -85,7 +83,7 @@ class WorldModelEnv:
         self.obs_tokens = torch.cat(obs_tokens, dim=1)        # (B, K)
 
         obs = self.decode_obs_tokens() if should_predict_next_obs else None
-        return obs, reward, terminated, truncated, None
+        return obs, reward, done, None
 
     @torch.no_grad()
     def render_batch(self) -> List[Image.Image]:
