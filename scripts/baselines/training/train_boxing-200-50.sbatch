@@ -18,15 +18,15 @@ wandb_mode="online"
 common_epochs=200
 stop_after_epochs=50
 max_snapshots=150
-RUN_DIR="/shared/$(current_user)/training_outputs/iris/$(game_name)/$(date +'%Y-%m-%d')/$(date +'%H-%M-%S')"
+RUN_DIR="/shared/${current_user}/training_outputs/iris/${game_name}/$(date +'%Y-%m-%d')/$(date +'%H-%M-%S')"
 
 # go to repo, activate env
-cd "/home/$(current_user)/github/VersesTech/$(repo_name)/"
-source "$(env_name)/bin/activate"
+cd "/home/${current_user}/github/VersesTech/${repo_name}/"
+source "${env_name}/bin/activate"
 
 
 # clone current repo to the training output directory for posterity
-git clone --no-hardlinks . "$(RUN_DIR)/git_repo"
+git clone --no-hardlinks . "${RUN_DIR}/git_repo"
 
 echo "python src/main.py \
   env.train.id=\"$game_name\" \
