@@ -46,14 +46,21 @@ class Trainer:
         self.max_number_of_snapshots_saved = cfg.collection.train.max_number_of_snapshots_saved if cfg.collection.train.max_number_of_snapshots_saved is not None else 0
 
         if self.max_number_of_snapshots_saved  == 0:
+            # no snapshotting at all
             self.snapshots_saved_every_n_epochs = 0
         else:
             if self.max_number_of_snapshots_saved >= self.cfg.common.epochs:
+                # snapshot every epoch
                 self.snapshots_saved_every_n_epochs = 1
             else:
-                self.snapshots_saved_every_n_epochs  = max(self.cfg.common.epochs // 2, self.max_number_of_snapshots_saved // self.cfg.common.epochs)
+                # snapshot every n epochs
+                self.snapshots_saved_every_n_epochs = self.cfg.common.epochs / self.max_number_of_snapshots_saved
+                if self.snapshots_saved_every_n_epochs >= self.cfg.common.epochs -1 :
+                    # for suffiently small max_number_of_snapshots_saved, we might not snapshot at all
+                    # in these cases, we will snapshot once right in the middle
+                    self.snapshots_saved_every_n_epochs = self.cfg.common.epochs // 2
 
-        print(f"Max number of snapshots saved: {self.max_number_of_snapshots_saved}, epochs: {cfg.common.epochs}, snapshots saved every n epochs: {self.snapshots_saved_every_n_epochs}")
+        print(f"Max number of snapshots saved: {self.max_number_of_snapshots_saved}, {cfg.common.epochs} epochs, snapshots saved every {self.snapshots_saved_every_n_epochs} epochs")
         self.snapshots_saved_count = 0
         self.media_dir = Path('media')
         self.episode_dir = self.media_dir / 'episodes'
