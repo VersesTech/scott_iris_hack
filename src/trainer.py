@@ -44,7 +44,16 @@ class Trainer:
         self.ckpt_dir = Path('checkpoints')
 
         self.max_number_of_snapshots_saved = cfg.collection.train.max_number_of_snapshots_saved if cfg.collection.train.max_number_of_snapshots_saved is not None else 0
-        self.snapshots_saved_every_n_epochs = 0 if self.max_number_of_snapshots_saved == 0 else self.cfg.common.epochs // self.max_number_of_snapshots_saved
+
+        if self.max_number_of_snapshots_saved  == 0:
+            self.snapshots_saved_every_n_epochs = 0
+        else:
+            if self.max_number_of_snapshots_saved >= self.cfg.common.epochs:
+                self.snapshots_saved_every_n_epochs = 1
+            else:
+                self.snapshots_saved_every_n_epochs  = max(self.cfg.common.epochs // 2, self.max_number_of_snapshots_saved // self.cfg.common.epochs)
+
+        print(f"Max number of snapshots saved: {self.max_number_of_snapshots_saved}, epochs: {cfg.common.epochs}, snapshots saved every n epochs: {self.snapshots_saved_every_n_epochs}")
         self.snapshots_saved_count = 0
         self.media_dir = Path('media')
         self.episode_dir = self.media_dir / 'episodes'
@@ -263,13 +272,21 @@ class Trainer:
 
     def save_checkpoint(self, epoch: int, save_agent_only: bool) -> None:
 
+        print(
+            f"Considering snapshot: snapshots_saved_every_n_epochs: {self.snapshots_saved_every_n_epochs}, snapshot count: {self.snapshots_saved_count}, max number of snapshots: {self.max_number_of_snapshots_saved}")
         if self.snapshots_saved_every_n_epochs != 0 and self.snapshots_saved_count < self.max_number_of_snapshots_saved:
-            if epoch % self.snapshots_saved_every_n_epochs == 0:
+            print (f"Snapshots left; checking ({epoch % self.snapshots_saved_every_n_epochs} ({epoch % self.snapshots_saved_every_n_epochs == 0}))")
+            if (epoch % self.snapshots_saved_every_n_epochs) == 0:
                 this_checkpoint_snapshot_dir = Path(str(self.ckpt_dir) + f"/epoch_{epoch}_snapshot")
                 print(f"Backing up snapshot for epoch {epoch}: copying from {self.ckpt_dir} to {this_checkpoint_snapshot_dir}")
                 shutil.copytree(src=self.ckpt_dir, dst=this_checkpoint_snapshot_dir, ignore=shutil.ignore_patterns('dataset', 'epoch_*_snapshot'))
                 self.snapshots_saved_count += 1
+            else:
+                print(f"Skipping snapshot for epoch {epoch}")
+        else:
+            print(f"NO MORE SNAPSHOTS.")
 
+        print(f"Saving checkpoint for epoch {epoch}...")
         tmp_checkpoint_dir = Path('checkpoints_tmp')
         shutil.copytree(src=self.ckpt_dir, dst=tmp_checkpoint_dir, ignore=shutil.ignore_patterns('dataset'))
         self._save_checkpoint(epoch, save_agent_only)

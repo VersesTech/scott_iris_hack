@@ -3,6 +3,7 @@
 wandb
 .vscode
 outputs
+simpletest_outputs
 results/figures
 slurm*
 experiments
